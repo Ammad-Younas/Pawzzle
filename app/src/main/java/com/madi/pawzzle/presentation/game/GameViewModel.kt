@@ -2,13 +2,14 @@ package com.madi.pawzzle.presentation.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.madi.pawzzle.domain.engine.PuzzleGenerator
 import com.madi.pawzzle.domain.engine.RuleValidator
-import com.madi.pawzzle.domain.model.Difficulty
 import com.madi.pawzzle.domain.model.GameState
 import com.madi.pawzzle.domain.model.GameStatus
 import com.madi.pawzzle.domain.model.Position
-import com.madi.pawzzle.domain.model.Puzzle
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,12 +18,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
-    private val ruleValidator: RuleValidator
+    private val ruleValidator: RuleValidator,
+    private val puzzleGenerator: PuzzleGenerator
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GameUiState())
@@ -30,6 +33,8 @@ class GameViewModel @Inject constructor(
 
     private val _uiEffect = MutableSharedFlow<GameUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
+
+    private var timerJob: Job? = null
 
     init {
         startNewGame()
@@ -45,32 +50,24 @@ class GameViewModel @Inject constructor(
     }
 
     private fun startNewGame() {
-        val size = 5
-        val regions = listOf(
-            listOf(0, 0, 1, 1, 1),
-            listOf(0, 2, 2, 1, 1),
-            listOf(0, 2, 3, 3, 3),
-            listOf(4, 4, 4, 3, 3),
-            listOf(4, 4, 4, 4, 4)
-        )
-        val puzzle = Puzzle(
-            id = 1L,
-            size = size,
-            regions = regions,
-            solution = emptySet(),
-            difficulty = Difficulty.EASY
-        )
-        _uiState.update {
-            it.copy(
-                gameState = GameState(puzzle = puzzle),
-                isLoading = false
-            )
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val puzzle = withContext(Dispatchers.IO) {
+                puzzleGenerator.generate(size = 5)
+            }
+            _uiState.update {
+                it.copy(
+                    gameState = GameState(puzzle = puzzle),
+                    isLoading = false
+                )
+            }
+            startTimer()
         }
-        startTimer()
     }
 
     private fun startTimer() {
-        viewModelScope.launch {
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
             while (isActive) {
                 delay(1000.milliseconds)
                 _uiState.update {
@@ -130,6 +127,7 @@ class GameViewModel @Inject constructor(
         }
 
         if (isWon) {
+            timerJob?.cancel()
             viewModelScope.launch {
                 _uiEffect.emit(GameUiEffect.ShowGameWonDialog)
             }

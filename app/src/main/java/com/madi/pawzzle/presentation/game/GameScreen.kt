@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -63,6 +65,7 @@ fun GameScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         GameBackground()
+        
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
@@ -70,7 +73,10 @@ fun GameScreen(
         ) {
             val isLandscape = maxWidth > maxHeight
             val gameState = uiState.gameState
-            if (gameState != null) {
+
+            if (uiState.isLoading) {
+                LoadingState()
+            } else if (gameState != null) {
                 if (isLandscape) {
                     LandscapeGameLayout(gameState, viewModel)
                 } else {
@@ -82,9 +88,29 @@ fun GameScreen(
 }
 
 @Composable
+private fun LoadingState() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(48.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Preparing Puzzle...",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+@Composable
 private fun PortraitGameLayout(
     state: GameState,
-    viewModel: GameViewModel = hiltViewModel()
+    viewModel: GameViewModel
 ) {
     Scaffold(
         containerColor = Color.Transparent,
@@ -120,7 +146,7 @@ private fun PortraitGameLayout(
 @Composable
 private fun LandscapeGameLayout(
     state: GameState,
-    viewModel: GameViewModel = hiltViewModel()
+    viewModel: GameViewModel
 ) {
     Row(
         modifier = Modifier

@@ -9,15 +9,10 @@ class SolutionCounter @Inject constructor(
 ) {
     fun countSolutions(puzzle: Puzzle, maxSolutions: Int = 2): Int {
         var count = 0
-
         fun backtrack(row: Int, cats: Set<Position>) {
-            if (count >= maxSolutions) {
-                return
-            }
+            if (count >= maxSolutions) return
             if (row == puzzle.size) {
-                if (ruleValidator.isValidSolution(puzzle, cats)) {
-                    count++
-                }
+                count++
                 return
             }
             for (column in 0 until puzzle.size) {
