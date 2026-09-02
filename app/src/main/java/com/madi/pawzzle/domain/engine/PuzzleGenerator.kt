@@ -43,9 +43,7 @@ class PuzzleGenerator @Inject constructor(
             val cols = (0 until size).toList().shuffled()
             for (col in cols) {
                 val pos = Position(row, col)
-                val hasConflict = ruleValidator.hasRowConflict(currentCats, pos) ||
-                        ruleValidator.hasColumnConflict(currentCats, pos) ||
-                        ruleValidator.hasAdjacentCat(currentCats, pos)
+                val hasConflict = ruleValidator.hasRowConflict(currentCats, pos) || ruleValidator.hasColumnConflict(currentCats, pos) || ruleValidator.hasAdjacentCat(currentCats, pos)
                 if (!hasConflict) {
                     val result = backtrack(rowIdx + 1, currentCats + pos)
                     if (result != null) return result
