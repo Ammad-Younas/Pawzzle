@@ -22,12 +22,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,22 +31,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.madi.pawzzle.domain.model.GameState
+import com.madi.pawzzle.domain.model.GameStatus
 import com.madi.pawzzle.presentation.game.components.GameBackground
 import com.madi.pawzzle.presentation.game.components.GameToolbar
 import com.madi.pawzzle.presentation.game.components.PuzzleBoard
 import com.madi.pawzzle.presentation.game.components.WinDialog
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun GameScreen(
     viewModel: GameViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val isWon = uiState.gameState?.status == com.madi.pawzzle.domain.model.GameStatus.WON
+    val isWon = uiState.gameState?.status == GameStatus.WON
 
     Box(modifier = Modifier.fillMaxSize()) {
         GameBackground()
-        
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
@@ -72,7 +67,7 @@ fun GameScreen(
 
         if (isWon) {
             WinDialog(
-                onDismiss = { /* User must click New Game */ },
+                onDismiss = {  },
                 onNewGame = { viewModel.onEvent(GameEvent.OnNewGameClicked) }
             )
         }

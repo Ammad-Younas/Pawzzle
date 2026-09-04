@@ -33,7 +33,7 @@ fun WinDialog(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
-            ) { }, // Consume clicks
+            ) { },
         contentAlignment = Alignment.Center
     ) {
         Card(

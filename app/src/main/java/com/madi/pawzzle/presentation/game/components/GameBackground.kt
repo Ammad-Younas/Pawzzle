@@ -65,7 +65,6 @@ fun GameBackground(
             val radius1 = size.minDimension * 0.7f
             val radius2 = size.minDimension * 0.9f
 
-            // Blob 1
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
@@ -79,7 +78,6 @@ fun GameBackground(
                 center = Offset(w * animX1, h * animY1)
             )
 
-            // Blob 2
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
