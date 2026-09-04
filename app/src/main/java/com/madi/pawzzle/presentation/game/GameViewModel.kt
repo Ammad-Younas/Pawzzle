@@ -11,10 +11,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -31,8 +31,8 @@ class GameViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<GameUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<GameUiEffect>()
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     private var timerJob: Job? = null
 
@@ -115,22 +115,20 @@ class GameViewModel @Inject constructor(
             }
         }
 
-        val isWon = ruleValidator.isValidSolution(currentState.puzzle, newCats)
-
-        _uiState.update {
-            it.copy(
-                gameState = currentState.copy(
+        _uiState.update { state ->
+            val gs = state.gameState ?: return@update state
+            val isWon = ruleValidator.isValidSolution(gs.puzzle, newCats)
+            state.copy(
+                gameState = gs.copy(
                     cats = newCats,
                     status = if (isWon) GameStatus.WON else GameStatus.PLAYING
                 )
             )
         }
 
-        if (isWon) {
+        // We can check the latest state to see if we won
+        if (_uiState.value.gameState?.status == GameStatus.WON) {
             timerJob?.cancel()
-            viewModelScope.launch {
-                _uiEffect.emit(GameUiEffect.ShowGameWonDialog)
-            }
         }
     }
 

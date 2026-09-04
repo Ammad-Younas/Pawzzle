@@ -1,0 +1,31 @@
+Is valid: true
+Can place Position(row=0, column=2): true
+  Inside: true
+  Row conflict: false
+  Col conflict: false
+  Region conflict: false
+  Adj conflict: false
+Can place Position(row=1, column=0): true
+  Inside: true
+  Row conflict: false
+  Col conflict: false
+  Region conflict: false
+  Adj conflict: false
+Can place Position(row=2, column=4): true
+  Inside: true
+  Row conflict: false
+  Col conflict: false
+  Region conflict: false
+  Adj conflict: false
+Can place Position(row=3, column=1): true
+  Inside: true
+  Row conflict: false
+  Col conflict: false
+  Region conflict: false
+  Adj conflict: false
+Can place Position(row=4, column=3): true
+  Inside: true
+  Row conflict: false
+  Col conflict: false
+  Region conflict: false
+  Adj conflict: false

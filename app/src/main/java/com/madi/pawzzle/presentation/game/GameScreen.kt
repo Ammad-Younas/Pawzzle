@@ -46,22 +46,7 @@ fun GameScreen(
     viewModel: GameViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var showWinDialog by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        viewModel.uiEffect.collectLatest { effect ->
-            when (effect) {
-                GameUiEffect.ShowGameWonDialog -> showWinDialog = true
-            }
-        }
-    }
-
-    if (showWinDialog) {
-        WinDialog(
-            onDismiss = { showWinDialog = false },
-            onNewGame = { viewModel.onEvent(GameEvent.OnNewGameClicked) }
-        )
-    }
+    val isWon = uiState.gameState?.status == com.madi.pawzzle.domain.model.GameStatus.WON
 
     Box(modifier = Modifier.fillMaxSize()) {
         GameBackground()
@@ -83,6 +68,13 @@ fun GameScreen(
                     PortraitGameLayout(gameState, viewModel)
                 }
             }
+        }
+
+        if (isWon) {
+            WinDialog(
+                onDismiss = { /* User must click New Game */ },
+                onNewGame = { viewModel.onEvent(GameEvent.OnNewGameClicked) }
+            )
         }
     }
 }
@@ -118,6 +110,7 @@ private fun PortraitGameLayout(
             GameToolbar(
                 catsCount = state.cats.size,
                 targetCount = state.puzzle.size,
+                status = state.status,
                 onRestart = { viewModel.onEvent(GameEvent.OnRestartClicked) },
             )
         }

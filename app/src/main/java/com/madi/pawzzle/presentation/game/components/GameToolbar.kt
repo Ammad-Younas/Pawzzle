@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 fun GameToolbar(
     catsCount: Int,
     targetCount: Int,
+    status: com.madi.pawzzle.domain.model.GameStatus,
     onRestart: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -45,6 +47,11 @@ fun GameToolbar(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+            )
+            Text(
+                text = "Status: $status",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Red
             )
         }
         IconButton(onClick = onRestart) {
